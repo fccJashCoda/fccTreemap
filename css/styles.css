@@ -1,0 +1,74 @@
+@import url('https://fonts.googleapis.com/css2?family=Mulish:wght@200;400;600;700&display=swap');
+
+:root {
+  --body-bg-color: #1b1b32;
+  --main-bg-color: #333;
+  --main-font-color: #000;
+  --tooltip-bg-color: #000;
+  --tooltip-font-color: #fff;
+  --btn-font-color: #fff;
+  --axis-font-color: #fff;
+  --link-color: gold;
+  --stuff: #2020dd;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  background: var(--body-bg-color);
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+  font-family: Arial, Helvetica, sans-serif;
+  color: #fff;
+}
+
+main {
+  margin: auto;
+}
+
+header {
+  margin-bottom: 1.5em;
+  text-align: center;
+}
+
+h1 {
+  margin: 0.5em 0 0 0;
+}
+
+h3 {
+  margin: 0;
+}
+
+.county {
+  cursor: pointer;
+}
+
+#tooltip {
+  position: absolute;
+  pointer-events: none;
+  background-color: var(--tooltip-bg-color);
+  color: var(--tooltip-font-color);
+  padding: 0.5em;
+  box-shadow: 3px 3px rgba(0, 0, 0, 0.5);
+  font-size: 0.65em;
+  opacity: 0.9;
+}
+
+g {
+  color: var(--axis-font-color);
+}
+
+text {
+  fill: var(--axis-font-color);
+}
+
+article {
+  min-height: 454px;
+  position: relative;
+}

@@ -33,7 +33,7 @@
             .sort((a, b) => b.value - a.value)
         );
 
-      // const color = d3.scaleOrdinal(d3.schemeCategory[9]);
+      const color = d3.scaleOrdinal(d3.schemeCategory10);
 
       const root = treemap(data);
 
@@ -48,8 +48,8 @@
       const svg = d3
         .select('article')
         .append('svg')
-        // .attr('width', WIDTH)
-        // .attr('height', HEIGHT)
+        .attr('width', WIDTH)
+        .attr('height', HEIGHT)
         .attr('viewBox', `0 0 ${WIDTH} ${HEIGHT}`);
 
       const leaf = svg
@@ -66,7 +66,31 @@
             .map((d) => d.data.name)}`
       );
 
-      // leaf.append('rect').attr('id', (d) => (d.leafUid = DOM.uid('leaf')).id);
+      leaf
+        .append('rect')
+        .attr('width', (d) => d.x1 - d.x0)
+        .attr('height', (d) => d.y1 - d.y0)
+        .attr('fill', (d) => {
+          while (d.depth > 1) d = d.parent;
+          return color(d.data.name);
+        })
+        .attr('fill', (d) => color(d.data.name))
+        .attr('fill-opacity', 0.6);
+
+      leaf.append('text').selectAll('tspan').data(data);
+      // .join('tspan')
+      // .attr('x', (d, i, nodes) => {
+      //   let w = d.parent.x1 - d.parent.x0 - 5;
+      //   let n = Math.floor(w / emojiSize);
+      //   return 3 + (i % n) * emojiSize;
+      // })
+      // .attr('y', (d, i, nodes) => {
+      //   let w = d.parent.x1 - d.parent.x0 - 5;
+      //   let n = Math.floor(w / emojiSize);
+      //   return 25 + Math.floor(i / n) * emojiSize;
+      // })
+      // .style('font-size', `${emojiSize}px`)
+      // .text((d) => d.name);
 
       // Tooltip animation
       svg;

@@ -63,7 +63,9 @@
           `${d
             .ancestors()
             .reverse()
-            .map((d) => d.data.name)}`
+            .map((d) => {
+              return d.data.name;
+            })}`
       );
 
       leaf
@@ -74,23 +76,36 @@
           while (d.depth > 1) d = d.parent;
           return color(d.data.name);
         })
-        .attr('fill', (d) => color(d.data.name))
         .attr('fill-opacity', 0.6);
 
-      leaf.append('text').selectAll('tspan').data(data);
-      // .join('tspan')
-      // .attr('x', (d, i, nodes) => {
-      //   let w = d.parent.x1 - d.parent.x0 - 5;
-      //   let n = Math.floor(w / emojiSize);
-      //   return 3 + (i % n) * emojiSize;
-      // })
-      // .attr('y', (d, i, nodes) => {
-      //   let w = d.parent.x1 - d.parent.x0 - 5;
-      //   let n = Math.floor(w / emojiSize);
-      //   return 25 + Math.floor(i / n) * emojiSize;
-      // })
-      // .style('font-size', `${emojiSize}px`)
-      // .text((d) => d.name);
+      leaf
+        .append('clipPath')
+        // .attr('id', (d) => (d.clipUid = DOM.uid('clip')).id)
+        .append('use');
+      // .attr('xlink:href', (d) => d.leafUid.href);
+
+      leaf
+        .append('text')
+        // .attr('clip-path', (d) => d.clipUid)
+        .selectAll('tspan')
+        .data((d) => {
+          console.log(d);
+          return d.data.name.split(' ');
+        })
+        .join('tspan')
+        .attr('x', 3)
+        .attr(
+          'y',
+          (d, i, nodes) => `${(i === nodes.length - 1) * 0.3 + 1.1 + i * 0.9}em`
+        )
+        .attr('fill-opacity', (d, i, nodes) =>
+          i === nodes.length - 1 ? 0.7 : null
+        )
+        .text((d) => {
+          console.log(d);
+          return d;
+        })
+        .attr('font-size', '.7em');
 
       // Tooltip animation
       svg;

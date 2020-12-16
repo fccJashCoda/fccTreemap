@@ -25,6 +25,12 @@
     function renderData(data) {
       //  Data
 
+      const format = (n) => {
+        return `$${+(Math.round(n / 1000000 + 'e2') + 'e-2')}m`;
+      };
+
+      console.log(format(777888999));
+
       const treemap = (data) =>
         d3.treemap().size([WIDTH, HEIGHT]).padding(1).round(true)(
           d3
@@ -78,19 +84,19 @@
         })
         .attr('fill-opacity', 0.6);
 
-      leaf
-        .append('clipPath')
-        // .attr('id', (d) => (d.clipUid = DOM.uid('clip')).id)
-        .append('use');
+      leaf;
+      // .append('clipPath')
+      // .attr('id', (d) => (d.clipUid = DOM.uid('clip')).id)
+      // .append('use');
       // .attr('xlink:href', (d) => d.leafUid.href);
 
       leaf
+        .append('g')
         .append('text')
         // .attr('clip-path', (d) => d.clipUid)
         .selectAll('tspan')
         .data((d) => {
-          console.log(d);
-          return d.data.name.split(' ');
+          return d.data.name.split(' ').concat(format(d.value));
         })
         .join('tspan')
         .attr('x', 3)
@@ -102,7 +108,6 @@
           i === nodes.length - 1 ? 0.7 : null
         )
         .text((d) => {
-          console.log(d);
           return d;
         })
         .attr('font-size', '.7em');

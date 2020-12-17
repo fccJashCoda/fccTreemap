@@ -2,20 +2,19 @@
   window.addEventListener('DOMContentLoaded', async () => {
     // Constants
     // ratio 192:122
-    const WIDTH = 975;
-    const HEIGHT = 610;
+    const WIDTH = 1344;
+    const HEIGHT = 854;
 
     // Init
-    const data = await fetchData('http://localhost:5555/api');
-    console.log(data);
+    const data = await fetchData('http://localhost:5555/api/videogames');
     renderData(data);
+    console.log(data);
 
     // funciton declarations
     async function fetchData(url) {
       try {
         const response = await fetch(url);
         const { data } = await response.json();
-        console.log(data);
         return data;
       } catch (err) {
         return {};
@@ -24,9 +23,9 @@
 
     function renderData(data) {
       //  Data
-
       const format = (n) => {
-        return `$${+(Math.round(n / 1000000 + 'e2') + 'e-2')}m`;
+        return `$${n}m`;
+        // +(Math.round(n / 1000000 + 'e2') + 'e-2')
       };
 
       const treemap = (data) =>
@@ -38,6 +37,8 @@
         );
 
       const color = d3.scaleOrdinal(d3.schemeCategory10);
+
+      console.log(color('action'));
 
       const root = treemap(data);
 
@@ -67,39 +68,38 @@
           `${d
             .ancestors()
             .reverse()
-            .map((d) => {
-              return d.data.name;
-            })}`
+            .map((d) => d.data.name)}`
       );
 
       leaf
         .append('rect')
+        .attr('class', 'tile')
         .attr('id', (d) => (d.leafUid = `rect${d.value}`))
-        .attr('width', (d) => d.x1 - d.x0)
+        .attr('width', (d) => {
+          console.log(d);
+          return d.x1 - d.x0;
+        })
         .attr('height', (d) => d.y1 - d.y0)
         .attr('fill', (d) => {
           while (d.depth > 1) d = d.parent;
           return color(d.data.name);
         })
-        .attr('fill-opacity', 0.6);
+        .attr('fill-opacity', 0.6)
+        .attr('data-name', (d) => d.data.name)
+        .attr('data-category', (d) => d.data.category)
+        .attr('data-value', (d) => d.data.value);
 
       leaf
         .append('clipPath')
         .attr('id', (d) => (d.clipUid = `clip${d.value}`))
         .append('use')
-        .attr('xlink:href', (d) => {
-          console.log(d.leafUid);
-          return `#${d.leafUid}`;
-        });
+        .attr('xlink:href', (d) => `#${d.leafUid}`);
 
       leaf
         .append('text')
         .attr('clip-path', (d) => `url(#${d.clipUid})`)
-        // .attr('clip-path', (d) => `url(${d.clipUid})`)
         .selectAll('tspan')
-        .data((d) => {
-          return d.data.name.split(' ').concat(format(d.value));
-        })
+        .data((d) => d.data.name.trim().split(' ').concat(format(d.value)))
         .join('tspan')
         .attr('x', 3)
         .attr(
@@ -115,27 +115,45 @@
         .attr('font-size', '.7em');
 
       // Tooltip animation
-      svg;
-      // .selectAll('.county')
-      // .on('mouseover', function (d) {
-      //   d3.select(this).order().raise().style('stroke', 'black');
-      //   const [education] = educationData.filter(
-      //     (county) => county.fips === d.id
-      //   );
-      //   const { x, y } = this.getBBox();
-      //   tooltip
-      //     .html(
-      //       `${education.area_name}, ${education.state}: ${education.bachelorsOrHigher}%`
-      //     )
-      //     .attr('data-education', `${education.bachelorsOrHigher}`)
-      //     .style('visibility', 'visible')
-      //     .style('top', `${y}px`)
-      //     .style('left', `${x + 20}px`);
-      // })
-      // .on('mouseout', function () {
-      //   d3.select(this).order().lower().style('stroke', 'none');
-      //   tooltip.style('visibility', 'hidden');
-      // });
+      svg
+        .selectAll('rect')
+        .on('mouseover', function (d) {
+          d3.select(this).order().raise().style('stroke', 'black');
+          console.log(d);
+          tooltip
+            .html(
+              `
+              Name: ${d.data.name}<br>
+              Category:${d.data.category}<br>
+              Value: ${format(d.data.value)}`
+            )
+            .attr('data-value', `${d.data.value}`)
+            .style('visibility', 'visible')
+            .style('top', `${d.y0}px`)
+            .style('left', `${d.x0 + 20}px`);
+        })
+        .on('mouseout', function () {
+          d3.select(this).order().lower().style('stroke', 'none');
+          tooltip.style('visibility', 'hidden');
+        });
+
+      const legend = d3.select('article').append('legend').attr('id', 'legend');
+
+      legend
+        .selectAll('rect')
+        .data(data.children)
+        .enter()
+        .append('g')
+        .append('rect')
+        .attr('class', 'legend-item')
+        .attr('fill', (d) => color(d.name))
+        .attr('width', '10px')
+        .attr('height', '10px');
+
+      legend
+        .selectAll('g')
+        .append('text')
+        .text((d) => d.name);
     }
   });
 })();

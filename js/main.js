@@ -2,10 +2,11 @@
   window.addEventListener('DOMContentLoaded', async () => {
     // Constants
     // ratio 192:122
-    const WIDTH = 1344;
-    const HEIGHT = 854;
+    const WIDTH = 1536;
+    const HEIGHT = 976;
 
     // Init
+    // const data = await fetchData('http://localhost:5555/api/');
     const data = await fetchData('http://localhost:5555/api/videogames');
     renderData(data);
     console.log(data);
@@ -25,7 +26,7 @@
       //  Data
       const format = (n) => {
         return `$${n}m`;
-        // +(Math.round(n / 1000000 + 'e2') + 'e-2')
+        // return `$${+(Math.round(n / 1000000 + 'e2') + 'e-2')}m`;
       };
 
       const treemap = (data) =>
@@ -45,6 +46,7 @@
       //Tooltip
       const tooltip = d3
         .select('article')
+        // .append('svg')
         .append('div')
         .attr('id', 'tooltip')
         .style('visibility', 'hidden');
@@ -53,6 +55,7 @@
       const svg = d3
         .select('article')
         .append('svg')
+        .attr('id', 'treemap')
         .attr('width', WIDTH)
         .attr('height', HEIGHT)
         .attr('viewBox', `0 0 ${WIDTH} ${HEIGHT}`);
@@ -63,22 +66,11 @@
         .join('g')
         .attr('transform', (d) => `translate(${d.x0}, ${d.y0})`);
 
-      leaf.append('title').text(
-        (d) =>
-          `${d
-            .ancestors()
-            .reverse()
-            .map((d) => d.data.name)}`
-      );
-
       leaf
         .append('rect')
         .attr('class', 'tile')
         .attr('id', (d) => (d.leafUid = `rect${d.value}`))
-        .attr('width', (d) => {
-          console.log(d);
-          return d.x1 - d.x0;
-        })
+        .attr('width', (d) => d.x1 - d.x0)
         .attr('height', (d) => d.y1 - d.y0)
         .attr('fill', (d) => {
           while (d.depth > 1) d = d.parent;
@@ -114,12 +106,18 @@
         })
         .attr('font-size', '.7em');
 
+      // //Tooltip
+      // const tooltip = d3
+      //   .select('#treemap')
+      //   .append('svg')
+      //   .attr('id', 'tooltip')
+      //   .style('visibility', 'hidden');
+
       // Tooltip animation
       svg
         .selectAll('rect')
-        .on('mouseover', function (d) {
+        .on('mousemove', function (d) {
           d3.select(this).order().raise().style('stroke', 'black');
-          console.log(d);
           tooltip
             .html(
               `
@@ -129,8 +127,12 @@
             )
             .attr('data-value', `${d.data.value}`)
             .style('visibility', 'visible')
-            .style('top', `${d.y0}px`)
-            .style('left', `${d.x0 + 20}px`);
+            // .attr('x', `${d3.event.pageY}`)
+            // .attr('y', `${d3.event.pageX}`);
+            // .style('top', `${d3.event.pageY - (d.y1 - d.y0)}px`)
+            // .style('left', `${d3.event.pageX - (d.x1 - d.x0)}px`);
+            .style('top', `${d3.event.pageY - HEIGHT / 4 + 30}px`)
+            .style('left', `${d3.event.pageX - WIDTH / 4 - 100}px`);
         })
         .on('mouseout', function () {
           d3.select(this).order().lower().style('stroke', 'none');

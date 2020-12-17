@@ -29,8 +29,6 @@
         return `$${+(Math.round(n / 1000000 + 'e2') + 'e-2')}m`;
       };
 
-      console.log(format(777888999));
-
       const treemap = (data) =>
         d3.treemap().size([WIDTH, HEIGHT]).padding(1).round(true)(
           d3
@@ -76,6 +74,7 @@
 
       leaf
         .append('rect')
+        .attr('id', (d) => (d.leafUid = `rect${d.value}`))
         .attr('width', (d) => d.x1 - d.x0)
         .attr('height', (d) => d.y1 - d.y0)
         .attr('fill', (d) => {
@@ -84,16 +83,19 @@
         })
         .attr('fill-opacity', 0.6);
 
-      leaf;
-      // .append('clipPath')
-      // .attr('id', (d) => (d.clipUid = DOM.uid('clip')).id)
-      // .append('use');
-      // .attr('xlink:href', (d) => d.leafUid.href);
+      leaf
+        .append('clipPath')
+        .attr('id', (d) => (d.clipUid = `clip${d.value}`))
+        .append('use')
+        .attr('xlink:href', (d) => {
+          console.log(d.leafUid);
+          return `#${d.leafUid}`;
+        });
 
       leaf
-        .append('g')
         .append('text')
-        // .attr('clip-path', (d) => d.clipUid)
+        .attr('clip-path', (d) => `url(#${d.clipUid})`)
+        // .attr('clip-path', (d) => `url(${d.clipUid})`)
         .selectAll('tspan')
         .data((d) => {
           return d.data.name.split(' ').concat(format(d.value));

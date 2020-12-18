@@ -10,6 +10,7 @@
     const data = await fetchData('http://localhost:5555/api/videogames');
     renderData(data);
     console.log(data);
+    console.log(d3);
 
     // funciton declarations
     async function fetchData(url) {
@@ -106,18 +107,17 @@
         })
         .attr('font-size', '.7em');
 
-      // //Tooltip
-      // const tooltip = d3
-      //   .select('#treemap')
-      //   .append('svg')
-      //   .attr('id', 'tooltip')
-      //   .style('visibility', 'hidden');
-
       // Tooltip animation
       svg
         .selectAll('rect')
         .on('mousemove', function (d) {
+          console.log(d);
           d3.select(this).order().raise().style('stroke', 'black');
+          const coordinates = d3.mouse(this);
+
+          const coordX = coordinates[0];
+          const coordY = coordinates[1];
+
           tooltip
             .html(
               `
@@ -127,12 +127,8 @@
             )
             .attr('data-value', `${d.data.value}`)
             .style('visibility', 'visible')
-            // .attr('x', `${d3.event.pageY}`)
-            // .attr('y', `${d3.event.pageX}`);
-            // .style('top', `${d3.event.pageY - (d.y1 - d.y0)}px`)
-            // .style('left', `${d3.event.pageX - (d.x1 - d.x0)}px`);
-            .style('top', `${d3.event.pageY - HEIGHT / 4 + 30}px`)
-            .style('left', `${d3.event.pageX - WIDTH / 4 - 100}px`);
+            .style('top', `${d.y0 + coordY - 15}px`)
+            .style('left', `${d.x0 + coordX + 20}px`);
         })
         .on('mouseout', function () {
           d3.select(this).order().lower().style('stroke', 'none');

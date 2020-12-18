@@ -10,7 +10,6 @@
     const data = await fetchData('http://localhost:5555/api/videogames');
     renderData(data);
     console.log(data);
-    console.log(d3);
 
     // funciton declarations
     async function fetchData(url) {
@@ -39,8 +38,6 @@
         );
 
       const color = d3.scaleOrdinal(d3.schemeCategory10);
-
-      console.log(color('action'));
 
       const root = treemap(data);
 
@@ -111,7 +108,6 @@
       svg
         .selectAll('rect')
         .on('mousemove', function (d) {
-          console.log(d);
           d3.select(this).order().raise().style('stroke', 'black');
           const coordinates = d3.mouse(this);
 
@@ -135,23 +131,32 @@
           tooltip.style('visibility', 'hidden');
         });
 
-      const legend = d3.select('article').append('legend').attr('id', 'legend');
+      const size = 20;
+      const legend = d3.select('#legend');
 
       legend
         .selectAll('rect')
         .data(data.children)
         .enter()
+        .append('div')
+        .append('svg')
+        .attr('width', 120)
+        .attr('height', 20)
         .append('g')
         .append('rect')
         .attr('class', 'legend-item')
         .attr('fill', (d) => color(d.name))
-        .attr('width', '10px')
-        .attr('height', '10px');
+        .attr('x', 0)
+        .attr('y', 0)
+        .attr('width', size)
+        .attr('height', size);
 
       legend
         .selectAll('g')
         .append('text')
-        .text((d) => d.name);
+        .text((d) => (d.name === '2600' ? 'ATARI2600' : d.name))
+        .attr('x', size * 1.2)
+        .attr('y', 15);
     }
   });
 })();

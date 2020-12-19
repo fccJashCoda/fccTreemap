@@ -6,16 +6,16 @@
     const HEIGHT = 976;
 
     // Init
-    // const data = await fetchData('http://localhost:5555/api/');
-    const data = await fetchData('http://localhost:5555/api/videogames');
+    const data = await fetchData(
+      'https://cdn.freecodecamp.org/testable-projects-fcc/data/tree_map/video-game-sales-data.json'
+    );
     renderData(data);
-    console.log(data);
 
     // funciton declarations
     async function fetchData(url) {
       try {
         const response = await fetch(url);
-        const { data } = await response.json();
+        const data = await response.json();
         return data;
       } catch (err) {
         return {};
@@ -26,7 +26,6 @@
       //  Data
       const format = (n) => {
         return `$${n}m`;
-        // return `$${+(Math.round(n / 1000000 + 'e2') + 'e-2')}m`;
       };
 
       const treemap = (data) =>
@@ -44,7 +43,6 @@
       //Tooltip
       const tooltip = d3
         .select('article')
-        // .append('svg')
         .append('div')
         .attr('id', 'tooltip')
         .style('visibility', 'hidden');
